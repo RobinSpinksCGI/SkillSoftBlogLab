@@ -3,6 +3,7 @@ package com.codecademy.blog.controller;
 
 import com.codecademy.blog.model.BlogPostDto;
 import com.codecademy.blog.service.BlogService;
+import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.User;
@@ -27,13 +28,13 @@ public class BlogController {
     }
 
     @GetMapping
-    public String blogHome(Model model) {
+    public String blogHome(Model model, HttpSession session) {
         User principal = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         String username = principal.getUsername();
         // Get blog posts for the current user
         model.addAttribute("posts", blogService.getUserPosts(username));
         // Check for draft in session
-        BlogPostDto draft = null;
+        BlogPostDto draft = (BlogPostDto) session.getAttribute("blogDraft");
         if (draft == null) {
             draft = new BlogPostDto();
         }
@@ -46,7 +47,8 @@ public class BlogController {
     }
 
     @PostMapping("/save-draft")
-    public String saveDraft(@ModelAttribute("newPost") BlogPostDto post) {
+    public String saveDraft(@ModelAttribute("newPost") BlogPostDto post, HttpSession session) {
+        session.setAttribute("blogDraft", post);
         return "redirect:/blog?draftSaved";
     }
 
