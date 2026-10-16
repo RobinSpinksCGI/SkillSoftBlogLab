@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blog App - Authentication</title>
+    <link rel="stylesheet" href="/css/auth.css">
+</head>
+<body>
+<h1>Blog Application</h1>
+
+<!-- Success/Error messages -->
+<div th:if="${param.error}" class="alert alert-danger">
+    Invalid username or password.
+</div>
+<div th:if="${param.logout}" class="alert alert-success">
+    You have been logged out.
+</div>
+<div th:if="${param.registered}" class="alert alert-success">
+    Registration successful! Please log in.
+</div>
+<div th:if="${userExistsError}" class="alert alert-danger" th:text="${userExistsError}">
+    Username already exists!
+</div>
+
+<!-- Tabs -->
+<div class="tabs">
+    <button id="loginTab" class="tab active">Login</button>
+    <button id="registerTab" class="tab">Register</button>
+</div>
+
+<!-- Login Form -->
+<div id="loginContent" class="tab-content active">
+    <h2>Login</h2>
+    <form th:action="@{/auth/login}" method="post">
+        <div class="form-group">
+            <label for="username">Username:</label>
+            <input type="text" id="username" name="username" required>
+        </div>
+        <div class="form-group">
+            <label for="password">Password:</label>
+            <input type="password" id="password" name="password" required>
+        </div>
+        <button type="submit">Login</button>
+    </form>
+</div>
+
+<!-- Register Form -->
+<div id="registerContent" class="tab-content">
+    <h2>Register</h2>
+    <form th:action="@{/auth/register}" th:object="${user}" method="post">
+        <div class="form-group">
+            <label for="reg-username">Username:</label>
+            <input type="text" id="reg-username" th:field="*{username}" required>
+            <div class="error" th:if="${#fields.hasErrors('username')}" th:errors="*{username}"></div>
+        </div>
+        <div class="form-group">
+            <label for="reg-password">Password:</label>
+            <input type="password" id="reg-password" th:field="*{password}" required>
+            <div class="error" th:if="${#fields.hasErrors('password')}" th:errors="*{password}"></div>
+        </div>
+        <button type="submit">Register</button>
+    </form>
+</div>
+
+<script src="/js/auth.js"></script>
+</body>
+</html>

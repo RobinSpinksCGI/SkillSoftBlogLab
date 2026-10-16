@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blog App</title>
+    <link rel="stylesheet" href="/css/blog.css">
+</head>
+<body>
+<div class="header">
+    <h1>Welcome to Your Blog, <span th:text="${username}">User</span>!</h1>
+    <form th:action="@{/auth/logout}" method="post">
+        <button type="submit" class="logout-btn">Logout</button>
+    </form>
+</div>
+
+<!-- Success messages -->
+<div th:if="${param.draftSaved}" class="alert alert-info">
+    Your draft has been saved to session. It will be available until you publish or logout.
+</div>
+<div th:if="${param.published}" class="alert alert-success">
+    Your blog post has been published!
+</div>
+
+<!-- New Post Form -->
+<h2>Create New Post</h2>
+<form th:action="@{/blog/publish}" th:object="${newPost}" method="post">
+    <div>
+        <input type="text" th:field="*{title}" placeholder="Post Title" required>
+        <div class="error" th:if="${#fields.hasErrors('title')}" th:errors="*{title}"></div>
+    </div>
+    <div>
+        <textarea th:field="*{content}" placeholder="Write your post here..." required></textarea>
+        <div class="error" th:if="${#fields.hasErrors('content')}" th:errors="*{content}"></div>
+    </div>
+    <div class="button-row">
+        <button type="submit" formaction="/blog/save-draft" class="save-btn">Save Draft</button>
+        <button type="submit" class="publish-btn">Publish Post</button>
+    </div>
+</form>
+
+<!-- Blog Posts -->
+<h2>Your Posts</h2>
+<div th:if="${posts.empty}">
+    <p>You haven't published any posts yet.</p>
+</div>
+<div th:each="post : ${posts}" class="blog-post">
+    <h3 class="blog-title" th:text="${post.title}">Post Title</h3>
+    <p class="blog-date" th:text="${#temporals.format(post.createdAt, 'MMMM dd, yyyy HH:mm')}">Date</p>
+    <div th:text="${post.content}">Post content goes here...</div>
+</div>
+</body>
+</html>
