@@ -4,6 +4,7 @@ package com.codecademy.blog.controller;
 import com.codecademy.blog.model.BlogPostDto;
 import com.codecademy.blog.service.BlogService;
 import jakarta.validation.Valid;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.User;
 
 import org.springframework.stereotype.Controller;
@@ -27,10 +28,10 @@ public class BlogController {
 
     @GetMapping
     public String blogHome(Model model) {
-        User principal = null;
-        String username = "REPLACE_ME";
+        User principal = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        String username = principal.getUsername();
         // Get blog posts for the current user
-        model.addAttribute("posts", Collections.emptyList());
+        model.addAttribute("posts", blogService.getUserPosts(username));
         // Check for draft in session
         BlogPostDto draft = null;
         if (draft == null) {
@@ -53,8 +54,8 @@ public class BlogController {
     public String publishPost(@Valid @ModelAttribute("newPost") BlogPostDto newPost,
                               BindingResult result,
                               Model model) {
-        User principal = null;
-        String username = "REPLACE_ME";
+        User principal = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        String username = principal.getUsername();
         if (result.hasErrors()) {
             model.addAttribute("posts", blogService.getUserPosts(username));
             return "blog";
