@@ -55,7 +55,8 @@ public class BlogController {
     @PostMapping("/publish")
     public String publishPost(@Valid @ModelAttribute("newPost") BlogPostDto newPost,
                               BindingResult result,
-                              Model model) {
+                              Model model,
+                              HttpSession session) {
         User principal = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         String username = principal.getUsername();
         if (result.hasErrors()) {
@@ -64,6 +65,7 @@ public class BlogController {
         }
 
         blogService.saveBlogPost(newPost, username);
+        session.removeAttribute("blogDraft");
 
         return "redirect:/blog?published";
     }
